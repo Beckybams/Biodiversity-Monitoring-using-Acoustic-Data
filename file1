@@ -1,0 +1,62 @@
+# Biodiversity-Monitoring-using-Acoustic-Data
+# Using Synthetic Acoustic Data
+
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
+
+# -----------------------------
+# 1. Generate Synthetic Acoustic Data
+# -----------------------------
+np.random.seed(42)
+
+samples = 1000      # number of audio samples
+features = 20       # simulated acoustic features (e.g., MFCCs)
+species = 4         # number of species/classes
+
+X = np.random.rand(samples, features)
+y = np.random.choice(species, samples)
+
+# Create DataFrame
+columns = [f"feature_{i+1}" for i in range(features)]
+data = pd.DataFrame(X, columns=columns)
+data["species_label"] = y
+
+# -----------------------------
+# 2. Train-Test Split
+# -----------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    data.drop("species_label", axis=1),
+    data["species_label"],
+    test_size=0.2,
+    random_state=42
+)
+
+# -----------------------------
+# 3. Train Classification Model
+# -----------------------------
+model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42
+)
+model.fit(X_train, y_train)
+
+# -----------------------------
+# 4. Model Evaluation
+# -----------------------------
+y_pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred))
+
+# -----------------------------
+# 5. Predict on New Acoustic Sample
+# -----------------------------
+new_sample = np.random.rand(1, features)
+prediction = model.predict(new_sample)
+
+print("Predicted Species Class:", prediction[0])
+fiel
